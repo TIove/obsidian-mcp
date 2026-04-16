@@ -59,6 +59,23 @@ def search_notes(query: str) -> list[dict]:
 
 
 @mcp.tool()
+def batch_write_notes(notes: list[dict]) -> list[str]:
+    """Create or overwrite multiple notes in one request.
+
+    Each item in `notes` must have:
+      - path: str    — path relative to vault root
+      - content: str — note content
+    """
+    results = []
+    for note in notes:
+        p = _resolve(note["path"])
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(note["content"], encoding="utf-8")
+        results.append(f"Written: {note['path']}")
+    return results
+
+
+@mcp.tool()
 def delete_note(path: str) -> str:
     """Delete a note."""
     p = _resolve(path)
